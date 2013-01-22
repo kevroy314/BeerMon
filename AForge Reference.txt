@@ -1,0 +1,7 @@
+AForge.NET Framework-2.2.4.exe should be run.
+
+Download at http://aforge.googlecode.com/files/AForge.NET%20Framework-2.2.4.exe
+
+or
+
+http://www.aforgenet.com/framework/downloads.html
