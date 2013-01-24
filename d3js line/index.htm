@@ -1,146 +1,108 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
-body {
+ 
+svg {
   font: 10px sans-serif;
 }
-
-.axis path,
-.axis line {
+ 
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+ 
+.axis path, .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
-
-.x.axis path {
-  display: none;
-}
-
-.line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
+ 
 </style>
 <body>
-<script src="http://d3js.org/d3.v3.js"></script>
+<script src="http://mbostock.github.com/d3/d3.js?2.7.2"></script>
 <script>
-var firstRun = true;
-var gtime = 13077;
-var margin;
-var parseDate;
-var x;
-var y;
-var xAxis;
-var yAxis;
-var line;
-var svg;
-var gdata;
 
-function setup()
-{
-margin = {top: 20, right: 20, bottom: 30, left: 50},
+var n = 40, duration = 500,
+	now = new Date(),
+	count = 0,
+    random = d3.random.normal(1, .2);
+	
+    data = d3.range(n).map(random);
+ 
+var margin = {top: 10, right: 10, bottom: 20, left: 40},
     width = window.innerWidth-25 - margin.left - margin.right,
     height = window.innerHeight-25 - margin.top - margin.bottom;
-
-parseDate = d3.time.format("%m%d%Y%H%M%S%L").parse;
-
-x = d3.time.scale()
+ 
+var x = d3.scale.linear()
+    .domain([now - (n - 2) * duration, now - duration])
     .range([0, width]);
-
-y = d3.scale.linear()
+ 
+var y = d3.scale.linear()
     .range([height, 0]);
-
-xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
-
-line = d3.svg.line()
-    .x(function(d) { return x(d.time); })
-    .y(function(d) { return y(d.motionlevel); });
-
-svg = d3.select("body").append("svg")
-	.attr("style", "border-style: solid; border-width: 1px; border-color: #DDDDDD; ")
+ 
+var line = d3.svg.line()
+	.interpolate("basis")
+    .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+    .y(function(d, i) { return y(d); });
+ 
+var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	
-   /* thanks to 'barrym' for examples of transform: https://gist.github.com/1137131 */
-   d3.tsv("data.tsv", function(error, data) {
-  data.forEach(function(d) {
-    d.time = parseDate(d.time);
-    d.motionlevel = +d.motionlevel;
-  });
-  gdata = data;
-  x.domain(d3.extent(data, function(d) { return d.time; }));
-  y.domain(d3.extent(data, function(d) { return d.motionlevel; }));
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Price ($)");
-
-  svg.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", line);
-});
+ 
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+ 
+var xaxis = svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
+ 
+var yaxis = svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.svg.axis().scale(y).orient("left"));
+ 
+var path = svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .data([data])
+    .attr("class", "line")
+    .attr("d", line);
+ 
+tick();
+ 
+function tick() {
+ 
+  // push a new data point onto the back
+  data.push(random());
+  now = new Date();
+  x.domain([now - (n - 2) * duration, now - duration]);
+  y.domain([0,d3.max(data)]);
+  
+  // redraw the line
+  svg.select(".line")
+      .attr("d", line)
+      .attr("transform", null);
+  
+	xaxis.transition()
+      .duration(duration)
+      .ease("linear")
+      .call(x.axis);
+  // slide the line left
+  path.transition()
+      .duration(duration)
+      .ease("linear")
+      .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+      .each("end", tick);
+ 
+  // pop the old data point off the front
+  data.shift();
+ 
 }
-			
-function redraw() {
-
-  var rect = svg.selectAll("path")
-      .data(gdata, function(d) { return d.time; });
-
-  rect.enter().append("line")
-      .attr("x", function(d, i) { return x(i + 1) - .5; })
-      .attr("y", function(d) { return height - y(d.motionlevel) - .5; })
-      .attr("width", width)
-      .attr("height", function(d) { return y(d.motionlevel); })
-    .transition()
-      .duration(1000)
-      .attr("x", function(d, i) { return x(i) - .5; });
-
-  rect.transition()
-      .duration(1000)
-      .attr("x", function(d, i) { return x(i) - .5; });
-
-  rect.exit().transition()
-      .duration(1000)
-      .attr("x", function(d, i) { return x(i - 1) - .5; })
-      .remove();
-
-}
-
-function run()
-{
-
-gdata.push({time: parseDate("012320131556"+gtime), motionlevel: 0.5});
-
-gtime+=2000;
-
-redraw();
-
-}
-
-setup();
-setInterval(run,1000);
-
+ 
 </script>
