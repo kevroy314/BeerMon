@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"
+        />
+        <title>Alchemy Client</title>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            function openConnection() {
+                // uses global 'conn' object
+                if (conn.readyState === undefined || conn.readyState > 1) {
+ 
+                    conn = new WebSocket('ws://localhost:8100');
+ 
+                    conn.onopen = function () {
+                        conn.send("Connection Established Confirmation");
+                    };
+ 
+ 
+                    conn.onmessage = function (event) {
+                        document.getElementById("content").innerHTML = event.data;
+                    };
+ 
+                    conn.onerror = function (event) {
+ 
+                        alert("Web Socket Error");
+                    };
+ 
+ 
+                    conn.onclose = function (event) {
+                        alert("Web Socket Closed");
+ 
+ 
+ 
+                    };
+                }
+            }
+ 
+ 
+ 
+            $(document).ready(function () {
+                conn = {}, window.WebSocket = window.WebSocket || window.MozWebSocket;
+ 
+ 
+                openConnection();
+            });
+        </script>
+    </head>
+    
+    <body>
+        <div id="content"></div>
+    </body>
+ 
+</html>
