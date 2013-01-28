@@ -13,7 +13,7 @@
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -78,6 +78,21 @@
     <Reference Include="AForge.Vision, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b612fa915eefaa06, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Release\AForge.Vision.dll</HintPath>
+    </Reference>
+    <Reference Include="Alchemy">
+      <HintPath>..\Alchemy-Websockets-master\AlchemyWebServer\bin\Release\Alchemy.dll</HintPath>
+    </Reference>
+    <Reference Include="AlchemyIntegrationTest">
+      <HintPath>..\Alchemy-Websockets-master\AlchemyWebServer\bin\Release\AlchemyIntegrationTest.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\Alchemy-Websockets-master\AlchemyWebServer\bin\Release\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.mocks">
+      <HintPath>..\Alchemy-Websockets-master\AlchemyWebServer\bin\Release\nunit.mocks.dll</HintPath>
+    </Reference>
+    <Reference Include="pnunit.framework">
+      <HintPath>..\Alchemy-Websockets-master\AlchemyWebServer\bin\Release\pnunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -149,6 +164,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="MotionDetector.exe.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -23,6 +23,10 @@ using AForge.Video.VFW;
 using AForge.Video.DirectShow;
 using AForge.Vision.Motion;
 using System.IO;
+using System.Collections.Concurrent;
+
+using Alchemy.Classes;
+using Alchemy;
 
 namespace MotionDetectorSample
 {
@@ -55,18 +59,32 @@ namespace MotionDetectorSample
         private int detectedObjectsCount = -1;
 
         private StreamWriter fileLogWriter = null;
+        public static List<string> data = new List<string>();
+        protected ConcurrentDictionary<string, Connection> OnlineConnections = new ConcurrentDictionary<string, Connection>();
+        private WebSocketServer aServer;
 
         // Constructor
         public MainForm( )
         {
             InitializeComponent( );
             Application.Idle += new EventHandler( Application_Idle );
+
+            aServer = new WebSocketServer(8100, System.Net.IPAddress.Any)
+            {
+                OnReceive = OnReceive,
+                OnSend = OnSend,
+                OnConnected = OnConnect,
+                OnDisconnect = OnDisconnect,
+                TimeOut = new TimeSpan(0, 5, 0)
+            };
+            aServer.Start();
         }
 
         // Application's main form is closing
         private void MainForm_FormClosing( object sender, FormClosingEventArgs e )
         {
             CloseVideoSource( );
+            aServer.Stop();
         }
 
         // "Exit" menu item clicked
@@ -259,8 +277,9 @@ namespace MotionDetectorSample
 
                     if (fileLogWriter != null && motionLevel != 0)
                     {
-                        DateTime n = DateTime.Now;
-                        fileLogWriter.WriteLine(n.ToString("MMddyyyyHHmmssfff") + "\t" + ToLongString(motionLevel));
+                        string outString = DateTime.Now.ToString("MMddyyyyHHmmssfff") + "\t" + ToLongString(motionLevel);
+                        fileLogWriter.WriteLine(outString);
+                        data.Add(outString);
                     }
                 }
             }
@@ -640,6 +659,79 @@ namespace MotionDetectorSample
                 ((ToolStripMenuItem)sender).Text = "Log Motion To File";
                 fileLogWriter.Close();
                 fileLogWriter = null;
+            }
+        }
+
+
+        public void OnConnect(UserContext aContext)
+        {
+            
+            //Console.WriteLine("Client Connected From : " + aContext.ClientAddress.ToString());
+            
+            // Create a new Connection Object to save client context information
+            var conn= new Connection {Context=aContext};
+ 
+            // Add a connection Object to thread-safe collection
+            OnlineConnections.TryAdd(aContext.ClientAddress.ToString(), conn);
+            
+        }
+ 
+       
+ 
+        public void OnReceive(UserContext aContext)
+        {
+            try
+            {
+                //Console.WriteLine("Data Received From [" + aContext.ClientAddress.ToString() + "] - " + aContext.DataFrame.ToString());
+ 
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine(ex.Message.ToString());
+            }
+            
+        }
+        public void OnSend(UserContext aContext)
+        {            
+            //Console.WriteLine("Data Sent To : " + aContext.ClientAddress.ToString());
+        }
+        public void OnDisconnect(UserContext aContext)
+        {
+            //Console.WriteLine("Client Disconnected : " + aContext.ClientAddress.ToString());
+ 
+            // Remove the connection Object from the thread-safe collection
+            Connection conn;
+            OnlineConnections.TryRemove(aContext.ClientAddress.ToString(),out conn);
+ 
+            // Dispose timer to stop sending messages to the client.
+            conn.timer.Dispose();
+        }
+    }
+
+    public class Connection
+    {
+        public System.Threading.Timer timer;
+        public UserContext Context { get; set; }
+        private int lastDataSent;
+
+        public Connection()
+        {
+            this.timer = new System.Threading.Timer(this.TimerCallback, null, 0, 1000);
+            lastDataSent = 0;
+        }
+
+        private void TimerCallback(object state)
+        {
+            try
+            {
+                int lastIndex = MainForm.data.Count;
+                for (int i = lastDataSent; i < lastIndex; i++)
+                    Context.Send(MainForm.data[i]);
+                lastDataSent = lastIndex;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
     }
