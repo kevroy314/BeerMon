@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Alchemy", "test\Integration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlchemyWebServer", "AlchemyWebServer\AlchemyWebServer.csproj", "{4113983D-83EF-402A-B81A-BC6B5335A24A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlchemyWebsocketsGraph", "AlchemyWebsocketsGraph\AlchemyWebsocketsGraph.csproj", "{1BE754F2-D50C-4610-8D8E-1597732BA87B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,18 @@ Global
 		{4113983D-83EF-402A-B81A-BC6B5335A24A}.Release|x64.ActiveCfg = Release|x86
 		{4113983D-83EF-402A-B81A-BC6B5335A24A}.Release|x86.ActiveCfg = Release|x86
 		{4113983D-83EF-402A-B81A-BC6B5335A24A}.Release|x86.Build.0 = Release|x86
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|x64.ActiveCfg = Release|Any CPU
+		{1BE754F2-D50C-4610-8D8E-1597732BA87B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

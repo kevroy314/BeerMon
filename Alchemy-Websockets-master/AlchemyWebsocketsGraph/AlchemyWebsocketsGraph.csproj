@@ -2,21 +2,18 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4113983D-83EF-402A-B81A-BC6B5335A24A}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{1BE754F2-D50C-4610-8D8E-1597732BA87B}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AlchemyWebServer</RootNamespace>
-    <AssemblyName>AlchemyWebServer</AssemblyName>
+    <RootNamespace>AlchemyWebsocketsGraph</RootNamespace>
+    <AssemblyName>AlchemyWebsocketsGraph</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,8 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,21 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Alchemy">
-      <HintPath>..\test\Integration\Alchemy\bin\Release\Alchemy.dll</HintPath>
-    </Reference>
-    <Reference Include="AlchemyIntegrationTest">
-      <HintPath>..\test\Integration\Alchemy\bin\Release\AlchemyIntegrationTest.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\test\Integration\Alchemy\bin\Release\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>..\test\Integration\Alchemy\bin\Release\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>..\test\Integration\Alchemy\bin\Release\pnunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,16 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Connection.cs" />
+    <Compile Include="WebsocketGraph.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AlchemyWebsocketsGraph\AlchemyWebsocketsGraph.csproj">
-      <Project>{1BE754F2-D50C-4610-8D8E-1597732BA87B}</Project>
-      <Name>AlchemyWebsocketsGraph</Name>
+    <ProjectReference Include="..\src\Alchemy\Alchemy.csproj">
+      <Project>{45486CDE-86A3-4769-952F-E0821BF79493}</Project>
+      <Name>Alchemy %28src\Alchemy%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

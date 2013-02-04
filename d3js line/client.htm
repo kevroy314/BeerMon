@@ -2,11 +2,17 @@
 <html>
     
     <head>
+	<style type="css">
+		.code { counter-reset: listing; }
+		code { counter-increment: listing; }
+		.code code:before { content: counter(listing) ". "; color: gray; }
+	</style>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"
         />
         <title>Alchemy Client</title>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript">
+		var dataCounter = 1;
             function openConnection() {
                 // uses global 'conn' object
                 if (conn.readyState === undefined || conn.readyState > 1) {
@@ -19,20 +25,19 @@
  
  
                     conn.onmessage = function (event) {
-                        document.getElementById("content").innerHTML = event.data;
+                        document.getElementById("content").innerHTML += dataCounter + ") " + event.data + "<br/>";
+						dataCounter++;
+						window.scrollTo(0, document.body.scrollHeight);
                     };
  
                     conn.onerror = function (event) {
  
-                        alert("Web Socket Error");
+                        document.getElementById("content").innerHTML += "Web Socket Error";
                     };
  
  
                     conn.onclose = function (event) {
-                        alert("Web Socket Closed");
- 
- 
- 
+                        document.getElementById("content").innerHTML += "Web Socket Closed";
                     };
                 }
             }
