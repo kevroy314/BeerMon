@@ -11,33 +11,38 @@ namespace AlchemyWebsocketsGraph
 {
     public class WebsocketGraph
     {
-        private List<object> data = new List<object>();
+        private List<object> m_data = new List<object>();
         //Thread-safe collection of Online Connections.
-        private ConcurrentDictionary<string, Connection> OnlineConnections = new ConcurrentDictionary<string, Connection>();
-        private WebSocketServer aServer;
-
+        private ConcurrentDictionary<string, Connection> m_onlineConnections = new ConcurrentDictionary<string, Connection>();
+        private WebSocketServer m_aServer;
+        private int? m_historySendOnConnectCount;
         #region Data Function
 
         public void addData(double x, double y)
         {
-            data.Add(new Tuple<double, double>(x, y));
+            m_data.Add(new Tuple<double, double>(x, y));
         }
 
+        public int DataCount
+        {
+            get { return m_data.Count; }
+        }
         #endregion
 
         #region Websocket Code
 
-        public WebsocketGraph()
+        public WebsocketGraph(TimeSpan timeout, int port, int? historySendOnConnectCount)
         {
-            aServer = new WebSocketServer(8100, System.Net.IPAddress.Any)
+            m_aServer = new WebSocketServer(port, System.Net.IPAddress.Any)
             {
                 OnReceive = OnReceive,
                 OnSend = OnSend,
                 OnConnected = OnConnect,
                 OnDisconnect = OnDisconnect,
-                TimeOut = new TimeSpan(0, 5, 0)
+                TimeOut = timeout
             };
-            aServer.Start();
+            m_historySendOnConnectCount = historySendOnConnectCount;
+            m_aServer.Start();
         }
 
         public void OnConnect(UserContext aContext)
@@ -46,11 +51,15 @@ namespace AlchemyWebsocketsGraph
             //Console.WriteLine("Client Connected From : " + aContext.ClientAddress.ToString());
 
             // Create a new Connection Object to save client context information
-            var conn = new Connection(ref data, renderPoint, true, 10);
+            Connection conn;
+            if(m_historySendOnConnectCount.HasValue)
+                conn = new Connection(ref m_data, renderPoint, true, m_historySendOnConnectCount.Value);
+            else
+                conn = new Connection(ref m_data, renderPoint, false, null);
             conn.Context = aContext;
 
             // Add a connection Object to thread-safe collection
-            OnlineConnections.TryAdd(aContext.ClientAddress.ToString(), conn);
+            m_onlineConnections.TryAdd(aContext.ClientAddress.ToString(), conn);
 
         }
 
@@ -79,7 +88,7 @@ namespace AlchemyWebsocketsGraph
 
             // Remove the connection Object from the thread-safe collection
             Connection conn;
-            OnlineConnections.TryRemove(aContext.ClientAddress.ToString(), out conn);
+            m_onlineConnections.TryRemove(aContext.ClientAddress.ToString(), out conn);
 
             // Dispose timer to stop sending messages to the client.
             conn.StopConnectionThread();
@@ -87,7 +96,7 @@ namespace AlchemyWebsocketsGraph
 
         public void StopServer()
         {
-            aServer.Stop();
+            m_aServer.Stop();
         }
 
         #endregion

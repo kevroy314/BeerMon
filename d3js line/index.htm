@@ -1,140 +1,415 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
- 
-svg {
-  font: 10px sans-serif;
-}
- 
-.line {
-  fill: none;
-  stroke: #000;
-  stroke-width: 1.5px;
-}
- 
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
- 
-</style>
-<body>
-<script src="http://mbostock.github.com/d3/d3.js?2.7.2"></script>
-<script>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 
-var n, 
-	duration,
-	count,
-    random;
-	
-var data;
-var margin,
-    width,
-    height;
-var x;
-var y;
-var line;
-var svg;
-var xaxis;
-var yaxis;
-var path;
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript">
  
-var startX;
- 
-function setup(time, startValue)
- {
-	n = 40, duration = 500,
-		count = 0,
-		random = d3.random.normal(startValue, 0);
+ /**
+ * Gray theme for Highcharts JS
+ * @author Torstein Hønsi
+ */
+
+Highcharts.theme = {
+   colors: ["#DDDF0D", "#7798BF", "#55BF3B", "#DF5353", "#aaeeee", "#ff0066", "#eeaaee",
+      "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
+   chart: {
+      backgroundColor: {
+         linearGradient: [0, 0, 0, 400],
+         stops: [
+            [0, 'rgb(96, 96, 96)'],
+            [1, 'rgb(16, 16, 16)']
+         ]
+      },
+      borderWidth: 0,
+      borderRadius: 15,
+      plotBackgroundColor: null,
+      plotShadow: false,
+      plotBorderWidth: 0
+   },
+   title: {
+      style: {
+         color: '#FFF',
+         font: '16px Lucida Grande, Lucida Sans Unicode, Verdana, Arial, Helvetica, sans-serif'
+      }
+   },
+   subtitle: {
+      style: {
+         color: '#DDD',
+         font: '12px Lucida Grande, Lucida Sans Unicode, Verdana, Arial, Helvetica, sans-serif'
+      }
+   },
+   xAxis: {
+      gridLineWidth: 0,
+      lineColor: '#999',
+      tickColor: '#999',
+      labels: {
+         style: {
+            color: '#999',
+            fontWeight: 'bold'
+         }
+      },
+      title: {
+         style: {
+            color: '#AAA',
+            font: 'bold 12px Lucida Grande, Lucida Sans Unicode, Verdana, Arial, Helvetica, sans-serif'
+         }
+      }
+   },
+   yAxis: {
+      alternateGridColor: null,
+      minorTickInterval: null,
+      gridLineColor: 'rgba(255, 255, 255, .1)',
+      lineWidth: 0,
+      tickWidth: 0,
+      labels: {
+         style: {
+            color: '#999',
+            fontWeight: 'bold'
+         }
+      },
+      title: {
+         style: {
+            color: '#AAA',
+            font: 'bold 12px Lucida Grande, Lucida Sans Unicode, Verdana, Arial, Helvetica, sans-serif'
+         }
+      }
+   },
+   legend: {
+      itemStyle: {
+         color: '#CCC'
+      },
+      itemHoverStyle: {
+         color: '#FFF'
+      },
+      itemHiddenStyle: {
+         color: '#333'
+      }
+   },
+   labels: {
+      style: {
+         color: '#CCC'
+      }
+   },
+   tooltip: {
+      backgroundColor: {
+         linearGradient: [0, 0, 0, 50],
+         stops: [
+            [0, 'rgba(96, 96, 96, .8)'],
+            [1, 'rgba(16, 16, 16, .8)']
+         ]
+      },
+      borderWidth: 0,
+      style: {
+         color: '#FFF'
+      }
+   },
+
+
+   plotOptions: {
+      line: {
+         dataLabels: {
+            color: '#CCC'
+         },
+         marker: {
+            lineColor: '#333'
+         }
+      },
+      spline: {
+         marker: {
+            lineColor: '#333'
+         }
+      },
+      scatter: {
+         marker: {
+            lineColor: '#333'
+         }
+      },
+      candlestick: {
+         lineColor: 'white'
+      }
+   },
+
+   toolbar: {
+      itemStyle: {
+         color: '#CCC'
+      }
+   },
+
+   navigation: {
+      buttonOptions: {
+         backgroundColor: {
+            linearGradient: [0, 0, 0, 20],
+            stops: [
+               [0.4, '#606060'],
+               [0.6, '#333333']
+            ]
+         },
+         borderColor: '#000000',
+         symbolStroke: '#C0C0C0',
+         hoverSymbolStroke: '#FFFFFF'
+      }
+   },
+
+   exporting: {
+      buttons: {
+         exportButton: {
+            symbolFill: '#55BE3B'
+         },
+         printButton: {
+            symbolFill: '#7797BE'
+         }
+      }
+   },
+
+   // scroll charts
+   rangeSelector: {
+      buttonTheme: {
+         fill: {
+            linearGradient: [0, 0, 0, 20],
+            stops: [
+               [0.4, '#888'],
+               [0.6, '#555']
+            ]
+         },
+         stroke: '#000000',
+         style: {
+            color: '#CCC',
+            fontWeight: 'bold'
+         },
+         states: {
+            hover: {
+               fill: {
+                  linearGradient: [0, 0, 0, 20],
+                  stops: [
+                     [0.4, '#BBB'],
+                     [0.6, '#888']
+                  ]
+               },
+               stroke: '#000000',
+               style: {
+                  color: 'white'
+               }
+            },
+            select: {
+               fill: {
+                  linearGradient: [0, 0, 0, 20],
+                  stops: [
+                     [0.1, '#000'],
+                     [0.3, '#333']
+                  ]
+               },
+               stroke: '#000000',
+               style: {
+                  color: 'yellow'
+               }
+            }
+         }
+      },
+      inputStyle: {
+         backgroundColor: '#333',
+         color: 'silver'
+      },
+      labelStyle: {
+         color: 'silver'
+      }
+   },
+
+   navigator: {
+      handles: {
+         backgroundColor: '#666',
+         borderColor: '#AAA'
+      },
+      outlineColor: '#CCC',
+      maskFill: 'rgba(16, 16, 16, 0.5)',
+      series: {
+         color: '#7798BF',
+         lineColor: '#A6C7ED'
+      }
+   },
+
+   scrollbar: {
+      barBackgroundColor: {
+            linearGradient: [0, 0, 0, 20],
+            stops: [
+               [0.4, '#888'],
+               [0.6, '#555']
+            ]
+         },
+      barBorderColor: '#CCC',
+      buttonArrowColor: '#CCC',
+      buttonBackgroundColor: {
+            linearGradient: [0, 0, 0, 20],
+            stops: [
+               [0.4, '#888'],
+               [0.6, '#555']
+            ]
+         },
+      buttonBorderColor: '#CCC',
+      rifleColor: '#FFF',
+      trackBackgroundColor: {
+         linearGradient: [0, 0, 0, 10],
+         stops: [
+            [0, '#000'],
+            [1, '#333']
+         ]
+      },
+      trackBorderColor: '#666'
+   },
+
+   // special colors for some of the demo examples
+   legendBackgroundColor: 'rgba(48, 48, 48, 0.8)',
+   legendBackgroundColorSolid: 'rgb(70, 70, 70)',
+   dataLabelsColor: '#444',
+   textColor: '#E0E0E0',
+   maskColor: 'rgba(255,255,255,0.3)'
+};
+
+// Apply the theme
+var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+</script>
+<body>
+
+<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<div id="debug"></div>
+<div id="stats"></div>
+<script type="text/javascript">
+var oooPainted = 0;
+$(function () {
+    $(document).ready(function() {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+    
+        var chart;
+        var tickTime = 33;
+		var maxPointsPerTick = 5;
 		
-		data = d3.range(n).map(random);
-	 
-	margin = {top: 10, right: 10, bottom: 20, left: 40},
-		width = window.innerWidth-25 - margin.left - margin.right,
-		height = window.innerHeight-25 - margin.top - margin.bottom;
-	 startX = time-(n-2)*duration;
-	x = d3.scale.linear()
-		.domain([startX, time - duration])
-		.range([0, width]);
-	 
-	y = d3.scale.linear()
-		.range([height, 0]);
-	 
-	line = d3.svg.line()
-		//.interpolate("basis")
-		.x(function(d, i) { return x(time - (n - 1 - i) * duration); })
-		.y(function(d, i) { return y(d); });
-	 
-	svg = d3.select("body").append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-	  .append("g")
-		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	 
-	svg.append("defs").append("clipPath")
-		.attr("id", "clip")
-	  .append("rect")
-		.attr("width", width)
-		.attr("height", height);
-	 
-	xaxis = svg.append("g")
-		.attr("class", "x axis")
-		.attr("transform", "translate(0," + height + ")")
-		.call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
-	 
-	yaxis = svg.append("g")
-		.attr("class", "y axis")
-		.call(y.axis = d3.svg.axis().scale(y).orient("left"));
-	 
-	path = svg.append("g")
-		.attr("clip-path", "url(#clip)")
-	  .append("path")
-		.data([data])
-		.attr("class", "line")
-		.attr("d", line);
- }
- 
-function tick(t, val) {
- 
-  // push a new data point onto the back
-  data.push(val);
-  //now = new Date();
-  //x.domain([t - (n - 2) * duration, t - duration]);
-  x.domain([startX, t /*- duration*/]);
-  y.domain([0,d3.max(data)]);
-  
-  // redraw the line
-  svg.select(".line")
-      .attr("d", line)
-      .attr("transform", null);
-  
-	xaxis.transition()
-	  .duration(duration)
-	  .ease("linear")
-	  .call(x.axis);
-	  
-	  yaxis.transition()
-		.duration(duration)
-		.ease("linear")
-		.call(y.axis);
-	// slide the line left
-	//path.transition()
-      //.duration(duration)
-      //.ease("linear")
-      //.attr("transform", "translate(" + x(t - (n - 1) * duration) + ")")
-      //.each("end", tick);
- 
-  // pop the old data point off the front
-  //if(data.length>n)
-	//data.shift();
- 
-}
- 
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'spline',
+                marginRight: 10,
+                events: {
+                    load: function() {
+    
+                        // set up the updating of the chart each second
+                        var series = this.series[0];
+                        setInterval(function() {
+							var addCount = 0;
+							while(wsBuffer.length>0&&addCount<maxPointsPerTick)
+							{
+								var point = wsBuffer.shift();
+								if(!(typeof point === 'undefined'))
+								{
+									if(point.o)
+									{
+										if(point.x>Highcharts.charts[0].series[0].data[0].x)
+										{
+											oooPainted++;
+											var index = 0;
+											for(var i = 0; i < Highcharts.charts[0].series[0].data.length;i++)
+												if(Highcharts.charts[0].series[0].data[i].x>point.x)
+												{
+													index = i;
+													break;
+												}
+											Highcharts.charts[0].series[0].data.splice(index,0,{x: point.x, y: point.y});
+										}
+									}
+									else
+										series.addPoint([point.x, point.y], true, true); //First overdraws without dots, second adds without removing
+									addCount++;
+								}
+							}
+                        }, tickTime);
+                    }
+                }
+            },
+            title: {
+                text: 'Live random data'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                title: {
+                    text: 'Value'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    marker: {
+                        enabled: false,
+                        states: {
+                            hover: {
+                                radius: 2,
+                                enabled: true
+                            }
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Random data',
+                data: (function() {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+    
+                    for (i = -199; i <= 0; i++) {
+                        data.push({
+                            x: 2072013141022060,
+                            y: 0
+                        });
+                    }
+                    return data;
+                })()
+            }]
+        });
+    });
+    
+});
+
 </script>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
         <script type="text/javascript">
+		var totalReceived = 0;
+		var wsBuffer = new Array();
+		var maxX = 0;
+		var oooCount = 0;
+		var oooIndicies = new Array();
+		var lineCount = 0;
+		
+		function tick(t, val, outOfOrder)
+		{
+			wsBuffer.push({x: t, y: val, o: outOfOrder});
+		}
+		
 		var firstPacket = true;
 		
             function openConnection() {
@@ -149,21 +424,37 @@ function tick(t, val) {
  
  
                     conn.onmessage = function (event) {
-					if(firstPacket)
-					{
-						var val = event.data.split("\t");
-						var t = +(val[0]);
-						var z = +(val[1]);
+					//if(firstPacket)
+					//{
+						//var val = event.data.split("\t");
+						//var t = +(val[0]);
+						//var z = +(val[1]);
 						
-						setup(t,z);
+						//setup(t,z);
 						
-						firstPacket=false;
-					}
-					else
-					{
+						//firstPacket=false;
+					//}
+					//else
+					//{
+						totalReceived++;
 						var val = event.data.split("\t");
-						tick(+(val[0]),+(val[1]));
-					}
+						
+						if(+val[0]>maxX) maxX = +val[0];
+						if(+val[0]<maxX)
+						{
+							document.getElementById("debug").innerHTML += "<font color='red'>" + (lineCount+1) + ") " + event.data + "</font><br/>";
+							oooCount++;
+							oooIndicies.push(lineCount+1);
+							tick(+(val[0]),+(val[1]),true);
+						}
+						else
+						{
+							tick(+(val[0]),+(val[1]),false);
+							document.getElementById("debug").innerHTML += (lineCount+1) + ") " + event.data + "<br/>";
+						}
+						lineCount++;
+						document.getElementById("stats").innerHtml = "Out of Order Count: " + oooCount;
+					//}
                     };
  
                     conn.onerror = function (event) {
